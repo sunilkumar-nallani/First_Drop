@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================================================
+   FirstDrop Global Styles
+   ============================================================================= */
+
+/* Base layer - Reset and default styles */
+@layer base {
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Body defaults */
+  body {
+    @apply bg-neutral-50 text-neutral-900 antialiased;
+    font-family: 'Inter', 'DM Sans', system-ui, sans-serif;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  /* Heading font family */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+    @apply font-bold tracking-tight text-neutral-900;
+  }
+
+  /* Selection color */
+  ::selection {
+    @apply bg-neutral-900/10 text-neutral-900;
+  }
+
+  /* Focus outline */
+  :focus-visible {
+    @apply outline-none ring-2 ring-neutral-900 ring-offset-2 ring-offset-neutral-50;
+  }
+}
+
+/* Component layer - Reusable component styles */
+@layer components {
+  /* Container with max width */
+  .container-main {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Primary button style */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-neutral-900 hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-900 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Secondary button style */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 border border-neutral-300 text-base font-medium rounded-lg text-neutral-900 bg-white hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-900 transition-colors duration-200;
+  }
+
+  /* Ghost button style */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-900 transition-colors duration-200;
+  }
+
+  /* Card style */
+  .card {
+    @apply bg-white rounded-2xl shadow-card p-6 transition-shadow duration-200 hover:shadow-card-hover border border-neutral-100;
+  }
+
+  /* Form input style */
+  .input-field {
+    @apply block w-full rounded-lg border-neutral-300 shadow-sm focus:border-neutral-900 focus:ring-neutral-900 sm:text-sm;
+  }
+
+  /* Label style */
+  .form-label {
+    @apply block text-sm font-medium text-neutral-700 mb-1;
+  }
+
+  /* Error text style */
+  .form-error {
+    @apply mt-1 text-sm text-neutral-900;
+  }
+}
+
+/* Utility layer - Custom utility classes */
+@layer utilities {
+  /* Text gradient utility */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-neutral-900 to-neutral-700;
+  }
+
+  /* Hide scrollbar utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* =============================================================================
+   Toast Notifications (react-hot-toast)
+   ============================================================================= */
+
+/* Custom toast styles */
+.toast-success {
+  @apply bg-green-50 border border-green-200 text-green-800 !important;
+}
+
+.toast-error {
+  @apply bg-red-50 border border-red-200 text-red-800 !important;
+}
+
+.toast-loading {
+  @apply bg-blue-50 border border-blue-200 text-blue-800 !important;
+}
+
+/* =============================================================================
+   Animation Utilities
+   ============================================================================= */
+
+/* Stagger animation delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* =============================================================================
+   Print Styles
+   ============================================================================= */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

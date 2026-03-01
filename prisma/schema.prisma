@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String          @id @default(cuid())
+  name            String
+  email           String          @unique
+  passwordHash    String          @map("password_hash")
+  isFounder       Boolean         @default(false) @map("is_founder")
+  isUser          Boolean         @default(true) @map("is_user")
+  about           String?
+  profilePhoto    String?         @map("profile_photo")
+  socialHandles   Json?           @map("social_handles")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  ideas           Idea[]
+  reactions       Reaction[]
+  waitlistEntries WaitlistEntry[]
+
+  @@index([email])
+  @@index([isFounder])
+  @@index([isUser])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model Idea {
+  id                 String          @id @default(cuid())
+  title              String
+  slug               String          @unique
+  sector             String
+  subSector          String?         @map("sub_sector")
+  ideaDescription    String          @map("idea_description")
+  moat               String
+  usp                String
+  marketSize         String?         @map("market_size")
+  ask                String?
+  isFirstTimeFounder Boolean         @default(false) @map("is_first_time_founder")
+  mediaUrls          Json?           @map("media_urls")
+  companyInfo        String?         @map("company_info")
+  contactInfo        String?         @map("contact_info")
+  founderId          String          @map("founder_id")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  founder            User            @relation(fields: [founderId], references: [id], onDelete: Cascade)
+  reactions          Reaction[]
+  waitlistEntries    WaitlistEntry[]
+
+  @@index([slug])
+  @@index([sector])
+  @@index([founderId])
+  @@index([createdAt])
+  @@index([subSector])
+  @@map("ideas")
+}
+
+model Reaction {
+  id        String       @id @default(cuid())
+  type      ReactionType
+  userId    String       @map("user_id")
+  ideaId    String       @map("idea_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+  idea      Idea         @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, ideaId])
+  @@index([userId])
+  @@index([ideaId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("reactions")
+}
+
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  email     String
+  userId    String?  @map("user_id")
+  ideaId    String   @map("idea_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@unique([email, ideaId])
+  @@index([email])
+  @@index([userId])
+  @@index([ideaId])
+  @@index([createdAt])
+  @@map("waitlist_entries")
+}
+
+enum ReactionType {
+  IN
+  PASS
+}
