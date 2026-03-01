@@ -10,6 +10,8 @@ import {
 } from '@/services/waitlistService';
 import { sendFounderNotification } from '@/lib/email';
 
+export const dynamic = 'force-dynamic';
+
 // =============================================================================
 // Interest API Route ("I'm In" Action)
 // =============================================================================
@@ -85,8 +87,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           // User might already be on waitlist, that's okay
           if (
             waitlistError instanceof Error &&
-            !waitlistError.message.includes('already on the waitlist')
+            waitlistError.message.includes('already on the waitlist')
           ) {
+            // Do not throw if already on waitlist. We still want to return a success
+            // message because their IN reaction might have successfully processed.
+            console.log('User already on waitlist, continuing processing');
+          } else {
             throw waitlistError;
           }
         }

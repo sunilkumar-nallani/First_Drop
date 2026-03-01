@@ -136,7 +136,13 @@ export default function CreateIdeaForm() {
 
       // Success
       toast.success('Idea listed successfully!');
-      router.push('/dashboard');
+
+      const ideaSlug = result.idea?.slug || result.idea?.id;
+      if (ideaSlug) {
+        router.push(`/idea/${ideaSlug}`);
+      } else {
+        router.push('/dashboard');
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Failed to create idea';

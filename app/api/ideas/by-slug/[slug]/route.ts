@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getIdeaBySlug } from '@/services/ideaService';
 
+export const dynamic = 'force-dynamic';
+
 // =============================================================================
 // Idea Detail API Route
 // =============================================================================

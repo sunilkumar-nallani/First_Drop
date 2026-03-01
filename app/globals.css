@@ -10,6 +10,7 @@
 
 /* Base layer - Reset and default styles */
 @layer base {
+
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
@@ -23,14 +24,21 @@
   }
 
   /* Heading font family */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
     @apply font-bold tracking-tight text-neutral-900;
   }
 
   /* Selection color */
   ::selection {
-    @apply bg-neutral-900/10 text-neutral-900;
+    background-color: rgba(59, 130, 246, 0.3);
+    /* blue-500/30 */
+    color: inherit;
   }
 
   /* Focus outline */
@@ -41,6 +49,7 @@
 
 /* Component layer - Reusable component styles */
 @layer components {
+
   /* Container with max width */
   .container-main {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
@@ -84,6 +93,7 @@
 
 /* Utility layer - Custom utility classes */
 @layer utilities {
+
   /* Text gradient utility */
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-neutral-900 to-neutral-700;
@@ -94,6 +104,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -105,6 +116,7 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
   .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -135,11 +147,25 @@
    ============================================================================= */
 
 /* Stagger animation delays */
-.stagger-1 { animation-delay: 0.1s; }
-.stagger-2 { animation-delay: 0.2s; }
-.stagger-3 { animation-delay: 0.3s; }
-.stagger-4 { animation-delay: 0.4s; }
-.stagger-5 { animation-delay: 0.5s; }
+.stagger-1 {
+  animation-delay: 0.1s;
+}
+
+.stagger-2 {
+  animation-delay: 0.2s;
+}
+
+.stagger-3 {
+  animation-delay: 0.3s;
+}
+
+.stagger-4 {
+  animation-delay: 0.4s;
+}
+
+.stagger-5 {
+  animation-delay: 0.5s;
+}
 
 /* =============================================================================
    Print Styles

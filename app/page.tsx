@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import { ArrowRight, Lightbulb, Users, CheckCircle, Sparkles } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import { prisma } from '@/lib/prisma';
 
 // =============================================================================
 // Landing Page
@@ -21,7 +22,25 @@ export const metadata: Metadata = {
 /**
  * Landing page component
  */
-export default function LandingPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function LandingPage() {
+  let ideasCount = 0;
+  let waitlistCount = 0;
+  let foundersCount = 0;
+  let usersCount = 0;
+
+  try {
+    [ideasCount, waitlistCount, foundersCount, usersCount] = await Promise.all([
+      prisma.idea.count(),
+      prisma.waitlistEntry.count(),
+      prisma.user.count({ where: { isFounder: true } }),
+      prisma.user.count({ where: { isUser: true } }),
+    ]);
+  } catch (error) {
+    console.error('Failed to fetch stats:', error);
+  }
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -184,10 +203,10 @@ export default function LandingPage() {
       <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <StatItem number="0" label="Ideas Listed" />
-            <StatItem number="0" label="Waitlist Entries" />
-            <StatItem number="0" label="Founders" />
-            <StatItem number="0" label="Early Adopters" />
+            <StatItem number={ideasCount.toString()} label="Ideas Listed" />
+            <StatItem number={waitlistCount.toString()} label="Waitlist Entries" />
+            <StatItem number={foundersCount.toString()} label="Founders" />
+            <StatItem number={usersCount.toString()} label="Early Adopters" />
           </div>
         </div>
       </section>

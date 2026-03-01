@@ -47,9 +47,9 @@ export default async function DashboardPage() {
     founderIdeas = await getFounderIdeas(userId);
   }
 
-  if (isUser) {
-    likedIdeas = await getUserWaitlistEntries(userId);
-  }
+  // Both standard users and founders can like ideas, so we load waitlist entries
+  // for all authenticated users to power the "Ideas You Liked" tab/section.
+  likedIdeas = await getUserWaitlistEntries(userId);
 
   return (
     <div className="min-h-screen bg-neutral-50 py-8 lg:py-12">

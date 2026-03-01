@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { Mail, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Button from '../ui/Button';
+import { useRouter } from 'next/navigation';
 
 // =============================================================================
 // Waitlist Email Form Component
@@ -58,6 +59,7 @@ export default function WaitlistEmailForm({
   className,
   onSuccess,
 }: WaitlistEmailFormProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -90,14 +92,17 @@ export default function WaitlistEmailForm({
 
       if (!response.ok) {
         if (result.error?.code === 'ALREADY_ON_WAITLIST') {
-          throw new Error('This email is already on the waitlist');
+          // Do not throw an error here. Treat as success since they want to be on the list
+          console.log('User is already on the waitlist.');
+        } else {
+          throw new Error(result.error?.message || 'Failed to join waitlist');
         }
-        throw new Error(result.error?.message || 'Failed to join waitlist');
       }
 
       // Success
       setIsSuccess(true);
       toast.success("You're on the waitlist!");
+      router.refresh(); // Tell Next.js to dump the cached router state so Home counters update instantly
       onSuccess?.();
     } catch (error) {
       const message =

@@ -444,7 +444,7 @@ export default function DiscoveryPage() {
 
         <div className="text-center mt-6">
           <Link
-            href={`/${currentIdea.slug}`}
+            href={`/idea/${currentIdea.slug}`}
             className="text-neutral-600 hover:text-neutral-900 font-medium"
           >
             View full idea page →

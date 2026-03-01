@@ -195,33 +195,31 @@ export default function DashboardContent({
         )}
       </Card>
 
-      {/* Tabs for dual-role users */}
-      {isFounder && isUser ? (
-        <Tabs defaultValue="founder">
-          <TabsList className="mb-6">
+      {/* Tabs for all authenticated users */}
+      <Tabs defaultValue={isFounder ? "founder" : "user"}>
+        <TabsList className="mb-6">
+          {isFounder && (
             <TabsTrigger value="founder">
               <Lightbulb className="w-4 h-4 mr-2" />
               Your Ideas
             </TabsTrigger>
-            <TabsTrigger value="user">
-              <Heart className="w-4 h-4 mr-2" />
-              Ideas You Liked
-            </TabsTrigger>
-          </TabsList>
+          )}
+          <TabsTrigger value="user">
+            <Heart className="w-4 h-4 mr-2" />
+            Ideas You Liked
+          </TabsTrigger>
+        </TabsList>
 
+        {isFounder && (
           <TabsContent value="founder">
             <FounderSection ideas={founderIdeas} />
           </TabsContent>
+        )}
 
-          <TabsContent value="user">
-            <UserSection entries={likedIdeas} />
-          </TabsContent>
-        </Tabs>
-      ) : isFounder ? (
-        <FounderSection ideas={founderIdeas} />
-      ) : (
-        <UserSection entries={likedIdeas} />
-      )}
+        <TabsContent value="user">
+          <UserSection entries={likedIdeas} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
@@ -305,7 +303,7 @@ function FounderSection({ ideas }: { ideas: Idea[] | null }) {
               </div>
 
               <Link
-                href={`/${idea.slug}`}
+                href={`/idea/${idea.slug}`}
                 className="p-2 text-neutral-400 hover:text-neutral-900 transition-colors"
                 title="View public page"
               >
@@ -348,42 +346,45 @@ function UserSection({ entries }: { entries: WaitlistEntry[] | null }) {
       </h2>
 
       <div className="grid grid-cols-1 gap-4">
-        {entries.map((entry) => (
-          <Card key={entry.id}>
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Badge variant="primary">{entry.idea.sector}</Badge>
-                  <span className="text-sm text-neutral-500">
-                    by {entry.idea.founder.name}
-                  </span>
+        {entries.map((entry: any) => {
+          if (!entry.idea) return null; // Failsafe
+          return (
+            <Card key={entry.id}>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Badge variant="primary">{entry.idea.sector}</Badge>
+                    <span className="text-sm text-neutral-500">
+                      by {entry.idea.founder?.name || 'Unknown Founder'}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-neutral-900">
+                    {entry.idea.title}
+                  </h3>
+                  <p className="text-sm text-neutral-600 line-clamp-2 mt-1">
+                    {entry.idea.ideaDescription}
+                  </p>
+                  <p className="text-xs text-neutral-400 mt-2">
+                    Joined on{' '}
+                    {new Date(entry.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </p>
                 </div>
-                <h3 className="text-lg font-semibold text-neutral-900">
-                  {entry.idea.title}
-                </h3>
-                <p className="text-sm text-neutral-600 line-clamp-2 mt-1">
-                  {entry.idea.ideaDescription}
-                </p>
-                <p className="text-xs text-neutral-400 mt-2">
-                  Joined on{' '}
-                  {new Date(entry.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </p>
-              </div>
 
-              <Link
-                href={`/${entry.idea.slug}`}
-                className="p-2 text-neutral-400 hover:text-neutral-900 transition-colors ml-4"
-                title="View idea page"
-              >
-                <ExternalLink className="w-5 h-5" />
-              </Link>
-            </div>
-          </Card>
-        ))}
+                <Link
+                  href={`/idea/${entry.idea.slug}`}
+                  className="p-2 text-neutral-400 hover:text-neutral-900 transition-colors ml-4"
+                  title="View idea page"
+                >
+                  <ExternalLink className="w-5 h-5" />
+                </Link>
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

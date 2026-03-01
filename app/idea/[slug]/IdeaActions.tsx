@@ -40,6 +40,7 @@ export default function IdeaActions({ ideaId }: IdeaActionsProps) {
 
       toast.success("You're on the waitlist!");
       setShowSuccess(true);
+      router.refresh(); // Clear Next.js cache so the dashboard and homepage update instantly
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An error occurred';
       toast.error(message);

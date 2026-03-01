@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../api/auth/[...nextauth]/route';
+import { authOptions } from '../../api/auth/[...nextauth]/route';
 import { getIdeaBySlug } from '@/services/ideaService';
 import { Heart, Users, TrendingUp, ArrowLeft, ExternalLink } from 'lucide-react';
 import Card from '@/components/ui/Card';
@@ -11,6 +11,9 @@ import Badge from '@/components/ui/Badge';
 import Avatar from '@/components/ui/Avatar';
 import WaitlistEmailForm from '@/components/forms/WaitlistEmailForm';
 import IdeaActions from './IdeaActions';
+import CopyLinkButton from '@/components/ui/CopyLinkButton';
+
+export const dynamic = 'force-dynamic';
 
 // =============================================================================
 // Public Idea Page
@@ -21,7 +24,7 @@ import IdeaActions from './IdeaActions';
 
 interface PageProps {
   params: Promise<{
-    companySlug: string;
+    slug: string;
   }>;
 }
 
@@ -31,8 +34,8 @@ interface PageProps {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { companySlug } = await params;
-  const idea = await getIdeaBySlug(companySlug);
+  const { slug } = await params;
+  const idea = await getIdeaBySlug(slug);
 
   if (!idea) {
     return {
@@ -55,10 +58,10 @@ export async function generateMetadata({
  * Public idea page component (Server Component)
  */
 export default async function IdeaPage({ params }: PageProps) {
-  const { companySlug } = await params;
+  const { slug } = await params;
 
   // Fetch idea
-  const idea = await getIdeaBySlug(companySlug);
+  const idea = await getIdeaBySlug(slug);
 
   // 404 if not found
   if (!idea) {
@@ -69,17 +72,24 @@ export default async function IdeaPage({ params }: PageProps) {
   const session = await getServerSession(authOptions);
   const isLoggedIn = !!session?.user;
 
+  // Render variables
+  const appHost = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const shareUrl = `${appHost}/idea/${idea.slug}`;
+
   return (
     <div className="min-h-screen bg-neutral-50 py-8 lg:py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back link */}
-        <Link
-          href="/discovery"
-          className="inline-flex items-center text-neutral-500 hover:text-neutral-900 transition-colors mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Discovery
-        </Link>
+        {/* Back link & Share */}
+        <div className="flex items-center justify-between mb-6">
+          <Link
+            href="/discovery"
+            className="inline-flex items-center text-neutral-500 hover:text-neutral-900 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Discovery
+          </Link>
+          <CopyLinkButton url={shareUrl} />
+        </div>
 
         {/* Main content */}
         <div className="space-y-8">

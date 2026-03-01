@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import slugify from 'slugify';
+import crypto from 'crypto';
 
 // =============================================================================
 // Idea Service
@@ -79,24 +80,39 @@ export interface IdeaWithFounder {
  */
 async function generateUniqueSlug(title: string): Promise<string> {
   // Create base slug from title
-  const baseSlug = slugify(title, {
+  let slug = slugify(title, {
     lower: true,
     strict: true,
     remove: /[*+~.()"'!:@]/g,
   });
 
-  // Check if slug exists
-  const existingIdea = await prisma.idea.findUnique({
-    where: { slug: baseSlug },
-  });
-
-  if (!existingIdea) {
-    return baseSlug;
+  if (!slug) {
+    slug = 'idea';
   }
 
-  // Slug exists, append random string
-  const randomSuffix = Math.random().toString(36).substring(2, 8);
-  return `${baseSlug}-${randomSuffix}`;
+  let uniqueSlug = slug;
+  let counter = 0;
+
+  while (true) {
+    const existingIdea = await prisma.idea.findUnique({
+      where: { slug: uniqueSlug },
+      select: { id: true },
+    });
+
+    if (!existingIdea) {
+      return uniqueSlug;
+    }
+
+    // Slug exists, append random string
+    const randomSuffix = crypto.randomBytes(3).toString('hex'); // 6 chars hex
+    uniqueSlug = `${slug}-${randomSuffix}`;
+    counter++;
+
+    // Safety fallback
+    if (counter > 10) {
+      return `${slug}-${Date.now()}`;
+    }
+  }
 }
 
 /**
