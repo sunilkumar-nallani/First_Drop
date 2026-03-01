@@ -184,10 +184,10 @@ export default function LandingPage() {
       <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <StatItem number="100+" label="Ideas Listed" />
-            <StatItem number="1,000+" label="Waitlist Entries" />
-            <StatItem number="50+" label="Founders" />
-            <StatItem number="500+" label="Early Adopters" />
+            <StatItem number="0" label="Ideas Listed" />
+            <StatItem number="0" label="Waitlist Entries" />
+            <StatItem number="0" label="Founders" />
+            <StatItem number="0" label="Early Adopters" />
           </div>
         </div>
       </section>
