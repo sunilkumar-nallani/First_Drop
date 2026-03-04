@@ -88,14 +88,14 @@ export default function WaitlistEmailForm({
         body: JSON.stringify({ email: data.email }),
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => null);
 
       if (!response.ok) {
-        if (result.error?.code === 'ALREADY_ON_WAITLIST') {
+        if (result?.error?.code === 'ALREADY_ON_WAITLIST') {
           // Do not throw an error here. Treat as success since they want to be on the list
           console.log('User is already on the waitlist.');
         } else {
-          throw new Error(result.error?.message || 'Failed to join waitlist');
+          throw new Error(result?.error?.message || 'Failed to join waitlist');
         }
       }
 
@@ -154,13 +154,13 @@ export default function WaitlistEmailForm({
               'text-neutral-900 placeholder-neutral-400',
               'transition-colors duration-200 border-neutral-200',
               'focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-neutral-900/10 focus:border-neutral-900',
-              errors.email && 'border-neutral-900 bg-neutral-50'
+              errors.email && 'border-red-300 bg-red-50'
             )}
             {...register('email')}
           />
         </div>
         {errors.email && (
-          <p className="mt-1.5 text-sm text-neutral-900">
+          <p className="mt-1.5 text-sm text-red-600">
             {errors.email.message}
           </p>
         )}

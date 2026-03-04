@@ -131,15 +131,15 @@
 
 /* Custom toast styles */
 .toast-success {
-  @apply bg-green-50 border border-green-200 text-green-800 !important;
+  @apply !bg-green-50 !border !border-green-200 !text-green-800;
 }
 
 .toast-error {
-  @apply bg-red-50 border border-red-200 text-red-800 !important;
+  @apply !bg-red-50 !border !border-red-200 !text-red-800;
 }
 
 .toast-loading {
-  @apply bg-blue-50 border border-blue-200 text-blue-800 !important;
+  @apply !bg-blue-50 !border !border-blue-200 !text-blue-800;
 }
 
 /* =============================================================================

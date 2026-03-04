@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -78,7 +77,6 @@ type RegisterFormData = z.infer<typeof registerSchema>;
  * ```
  */
 export default function RegisterForm({ type, className }: RegisterFormProps) {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   // Initialize form with react-hook-form and zod validation
@@ -145,13 +143,13 @@ export default function RegisterForm({ type, className }: RegisterFormProps) {
       }
 
       // Redirect based on primary role
+      // Use window.location.href for a full-page navigation to ensure
+      // the session cookie is fully loaded (avoids router.push + refresh race condition).
       if (type === 'founder') {
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
       } else {
-        router.push('/discovery');
+        window.location.href = '/discovery';
       }
-
-      router.refresh();
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Registration failed';

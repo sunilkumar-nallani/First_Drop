@@ -1,4 +1,6 @@
-import React, { ImgHTMLAttributes, forwardRef } from 'react';
+'use client';
+
+import React, { ImgHTMLAttributes, forwardRef, useState } from 'react';
 import { cn, getInitials } from '@/lib/utils';
 
 // =============================================================================
@@ -54,6 +56,8 @@ const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
     { src, name, size = 'md', bgColor, className, alt, ...props },
     ref
   ) => {
+    const [imgError, setImgError] = useState(false);
+
     // Size-specific styles
     const sizeStyles: Record<AvatarSize, string> = {
       xs: 'w-6 h-6 text-xs',
@@ -92,8 +96,8 @@ const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
       return colors[charCode % colors.length];
     };
 
-    // If there's a photo URL, render the image
-    if (src) {
+    // If there's a photo URL and it hasn't errored, render the image
+    if (src && !imgError) {
       return (
         <div
           ref={ref}
@@ -108,9 +112,9 @@ const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
             src={src}
             alt={alt || `${name}'s profile photo`}
             className="w-full h-full object-cover"
-            onError={(e) => {
-              // If image fails to load, show initials instead
-              (e.target as HTMLImageElement).style.display = 'none';
+            onError={() => {
+              // If image fails to load, show initials fallback
+              setImgError(true);
             }}
             {...props}
           />
@@ -118,7 +122,7 @@ const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
       );
     }
 
-    // No photo - render initials
+    // No photo or image failed to load - render initials
     return (
       <div
         ref={ref}

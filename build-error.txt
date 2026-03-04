@@ -1,0 +1,30 @@
+
+> firstdrop@1.0.0 build
+> next build
+
+   ▲ Next.js 15.5.12
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+Failed to compile.
+
+./components/ui/Avatar.tsx
+Error:   [31mx[0m You're importing a component that needs `useState`. This React Hook only works in a Client Component. To fix, mark the file (or its parent) with the `"use client"` directive.
+  [31m|[0m
+  [31m|[0m  Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+  [31m|[0m
+
+   ,-[[36;1;4mC:\Users\sunil\OneDrive\Desktop\firstdrop\components\ui\Avatar.tsx[0m:1:1]
+ [2m1[0m | import React, { ImgHTMLAttributes, forwardRef, useState } from 'react';
+   : [35;1m                                               ^^^^^^^^[0m
+ [2m2[0m | import { cn, getInitials } from '@/lib/utils';
+ [2m3[0m | 
+ [2m4[0m | // =============================================================================
+   `----
+
+Import trace for requested module:
+./components/ui/Avatar.tsx
+./app/idea/[slug]/page.tsx
+
+
+> Build failed because of webpack errors

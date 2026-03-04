@@ -5,16 +5,28 @@ import { Copy, Check } from 'lucide-react';
 import Button from './Button';
 
 interface CopyLinkButtonProps {
-    url: string;
+    url?: string;
+    path?: string;
     className?: string;
 }
 
-export default function CopyLinkButton({ url, className }: CopyLinkButtonProps) {
+export default function CopyLinkButton({ url, path, className }: CopyLinkButtonProps) {
     const [copied, setCopied] = useState(false);
+    const [fullUrl, setFullUrl] = useState(url || '');
+
+    // Set the full URL dynamically on the client using the current origin
+    // This removes 'localhost' hardcoding and adapts to any deployment domain
+    React.useEffect(() => {
+        if (!url && path) {
+            setFullUrl(`${window.location.origin}${path}`);
+        }
+    }, [url, path]);
 
     const handleCopy = async () => {
+        if (!fullUrl) return;
+
         try {
-            await navigator.clipboard.writeText(url);
+            await navigator.clipboard.writeText(fullUrl);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000); // Reset after 2s
         } catch (err) {

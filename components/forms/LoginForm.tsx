@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -40,7 +40,6 @@ type LoginFormData = z.infer<typeof loginSchema>;
  * ```
  */
 export default function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -84,14 +83,11 @@ export default function LoginForm() {
       toast.success('Welcome back!');
 
       // Redirect to callback URL or dashboard
+      // Use window.location.href for a full-page navigation to ensure
+      // the session cookie is fully loaded before rendering the next page.
+      // router.push + router.refresh causes a race condition (double-click bug).
       const callbackUrl = searchParams.get('callbackUrl');
-      if (callbackUrl) {
-        router.push(callbackUrl);
-      } else {
-        router.push('/dashboard');
-      }
-
-      router.refresh();
+      window.location.href = callbackUrl || '/dashboard';
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Login failed';
       toast.error(message);

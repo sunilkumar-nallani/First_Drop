@@ -33,7 +33,8 @@ export const config = {
     '/create',
     // API routes that require authentication
     '/api/dashboard/:path*',
-    '/api/ideas/:path*/interest',
+    // NOTE: /api/ideas/:path*/interest is intentionally NOT listed here
+    // because it handles both authenticated AND anonymous waitlist joins.
     '/api/ideas/:path*/pass',
     '/api/profile',
   ],
@@ -54,7 +55,7 @@ export default withAuth(
     }
 
     // Protect /create route - founders only
-    if (pathname === '/create' || pathname.startsWith('/api/ideas') && req.method !== 'GET') {
+    if (pathname === '/create' || (pathname.startsWith('/api/ideas') && req.method !== 'GET')) {
       if (!token.isFounder) {
         // User is not a founder, redirect to dashboard with error
         const dashboardUrl = new URL('/dashboard', req.url);

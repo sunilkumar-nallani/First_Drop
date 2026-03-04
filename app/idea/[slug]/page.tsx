@@ -73,8 +73,7 @@ export default async function IdeaPage({ params }: PageProps) {
   const isLoggedIn = !!session?.user;
 
   // Render variables
-  const appHost = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const shareUrl = `${appHost}/idea/${idea.slug}`;
+  const sharePath = `/idea/${idea.slug}`;
 
   return (
     <div className="min-h-screen bg-neutral-50 py-8 lg:py-12">
@@ -88,7 +87,7 @@ export default async function IdeaPage({ params }: PageProps) {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Discovery
           </Link>
-          <CopyLinkButton url={shareUrl} />
+          <CopyLinkButton path={sharePath} />
         </div>
 
         {/* Main content */}
