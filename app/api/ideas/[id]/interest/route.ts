@@ -98,18 +98,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
       }
 
-      // Send notification to founder (async, don't wait)
-      const founderEmail = await getFounderEmailForIdea(ideaId);
-      const idea = founderEmail
-        ? await import('@/services/ideaService').then((m) => m.getIdeaById(ideaId))
-        : null;
+      // Always fetch the idea (needed for both founder + user emails)
+      const idea = await import('@/services/ideaService').then((m) => m.getIdeaById(ideaId));
 
       if (idea) {
-        // Notify founder
-        if (founderEmail) {
-          sendFounderNotification(founderEmail, idea.title, userEmail!).catch(console.error);
+        const founderEmail = await getFounderEmailForIdea(ideaId);
+        // Notify founder if they have an email
+        if (founderEmail && userEmail) {
+          sendFounderNotification(founderEmail, idea.title, userEmail).catch(console.error);
         }
-        // Send confirmation to the user who joined
+        // Always send confirmation to the user who joined
         if (userEmail) {
           sendUserConfirmationEmail(userEmail, idea.title, idea.slug).catch(console.error);
         }
@@ -162,16 +160,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         throw waitlistError;
       }
 
-      // Send notification to founder + confirmation to user (async, don't wait)
-      const founderEmail = await getFounderEmailForIdea(ideaId);
+      // Always fetch the idea (needed for both founder + user emails)
       const idea = await import('@/services/ideaService').then((m) => m.getIdeaById(ideaId));
 
       if (idea) {
-        // Notify founder
+        const founderEmail = await getFounderEmailForIdea(ideaId);
+        // Notify founder if they have an email
         if (founderEmail) {
           sendFounderNotification(founderEmail, idea.title, email).catch(console.error);
         }
-        // Send confirmation email to the anonymous user who joined
+        // Always send confirmation to the anonymous user who joined
         sendUserConfirmationEmail(email, idea.title, idea.slug).catch(console.error);
       }
 
