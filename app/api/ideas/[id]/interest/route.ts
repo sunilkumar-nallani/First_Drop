@@ -8,7 +8,7 @@ import {
   addToWaitlist,
   getFounderEmailForIdea,
 } from '@/services/waitlistService';
-import { sendFounderNotification } from '@/lib/email';
+import { sendFounderNotification, sendUserConfirmationEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -100,16 +100,18 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
       // Send notification to founder (async, don't wait)
       const founderEmail = await getFounderEmailForIdea(ideaId);
-      if (founderEmail && userEmail) {
-        const idea = await import('@/services/ideaService').then((m) =>
-          m.getIdeaById(ideaId)
-        );
-        if (idea) {
-          sendFounderNotification(
-            founderEmail,
-            idea.title,
-            userEmail
-          ).catch(console.error);
+      const idea = founderEmail
+        ? await import('@/services/ideaService').then((m) => m.getIdeaById(ideaId))
+        : null;
+
+      if (idea) {
+        // Notify founder
+        if (founderEmail) {
+          sendFounderNotification(founderEmail, idea.title, userEmail!).catch(console.error);
+        }
+        // Send confirmation to the user who joined
+        if (userEmail) {
+          sendUserConfirmationEmail(userEmail, idea.title, idea.slug).catch(console.error);
         }
       }
 
@@ -160,19 +162,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         throw waitlistError;
       }
 
-      // Send notification to founder (async, don't wait)
+      // Send notification to founder + confirmation to user (async, don't wait)
       const founderEmail = await getFounderEmailForIdea(ideaId);
-      if (founderEmail) {
-        const idea = await import('@/services/ideaService').then((m) =>
-          m.getIdeaById(ideaId)
-        );
-        if (idea) {
-          sendFounderNotification(
-            founderEmail,
-            idea.title,
-            email
-          ).catch(console.error);
+      const idea = await import('@/services/ideaService').then((m) => m.getIdeaById(ideaId));
+
+      if (idea) {
+        // Notify founder
+        if (founderEmail) {
+          sendFounderNotification(founderEmail, idea.title, email).catch(console.error);
         }
+        // Send confirmation email to the anonymous user who joined
+        sendUserConfirmationEmail(email, idea.title, idea.slug).catch(console.error);
       }
 
       return NextResponse.json({

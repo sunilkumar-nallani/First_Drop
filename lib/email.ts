@@ -90,6 +90,134 @@ export async function sendFounderNotification(
 }
 
 /**
+ * Sends a confirmation email to the user who just joined the waitlist.
+ *
+ * @param userEmail - The user's email address
+ * @param ideaTitle - The title of the idea they joined
+ * @param ideaSlug - The slug for the idea URL
+ * @returns Promise resolving to true if sent successfully, false otherwise
+ */
+export async function sendUserConfirmationEmail(
+  userEmail: string,
+  ideaTitle: string,
+  ideaSlug: string
+): Promise<boolean> {
+  const subject = `You're on the waitlist for "${ideaTitle}"!`;
+  const html = buildUserConfirmationEmail(ideaTitle, ideaSlug);
+
+  if (!resend) {
+    console.log('========================================');
+    console.log('📧 USER CONFIRMATION EMAIL (Resend not configured)');
+    console.log('========================================');
+    console.log(`To: ${userEmail}`);
+    console.log(`Subject: ${subject}`);
+    console.log(`Idea: ${ideaTitle}`);
+    console.log('========================================');
+    return true;
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: `FirstDrop <${FROM_EMAIL}>`,
+      to: userEmail,
+      subject,
+      html,
+    });
+
+    if (error) {
+      console.error('Error sending user confirmation email:', error);
+      return false;
+    }
+
+    console.log(`📧 User confirmation email sent: ${data?.id}`);
+    return true;
+  } catch (error) {
+    console.error('Error sending user confirmation email:', error);
+    return false;
+  }
+}
+
+/**
+ * Builds the HTML email template for user waitlist confirmation.
+ */
+function buildUserConfirmationEmail(ideaTitle: string, ideaSlug: string): string {
+  const ideaUrl = `${APP_URL}/idea/${ideaSlug}`;
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're on the waitlist!</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f9fafb;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table role="presentation" style="width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center;">
+              <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700; color: #1a202c;">You're on the list! 🎉</h1>
+              <p style="margin: 0; font-size: 16px; color: #718096;">FirstDrop</p>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 20px 40px;">
+              <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #4a5568;">
+                Thank you for registering your interest in this idea. We've added you to the waitlist and the founder has been notified.
+              </p>
+
+              <table role="presentation" style="width: 100%; background-color: #f7fafc; border-radius: 12px; margin: 24px 0;">
+                <tr>
+                  <td style="padding: 24px;">
+                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">You joined the waitlist for</p>
+                    <p style="margin: 0; font-size: 20px; font-weight: 700; color: #1a202c;">${escapeHtml(ideaTitle)}</p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #4a5568;">
+                The founder will reach out to you directly with updates. Stay tuned!
+              </p>
+
+              <!-- CTA Button -->
+              <table role="presentation" style="width: 100%;">
+                <tr>
+                  <td align="center" style="padding: 16px 0;">
+                    <a href="${ideaUrl}" style="display: inline-block; padding: 16px 32px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                      View the Idea
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 20px 40px 40px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0 0 8px 0; font-size: 13px; color: #718096;">
+                You received this because you joined a waitlist on FirstDrop.
+              </p>
+              <p style="margin: 0; font-size: 13px; color: #a0aec0;">
+                <a href="${APP_URL}" style="color: #1a202c; text-decoration: none;">firstdrop.me</a> — Validate startup ideas before you build
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+}
+
+/**
  * Builds the HTML email template for founder notifications.
  * Uses inline styles for maximum email client compatibility.
  *
