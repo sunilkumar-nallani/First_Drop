@@ -29,16 +29,24 @@ export default function ForgotPasswordPage() {
         resolver: zodResolver(forgotPasswordSchema),
     });
 
-    const onSubmit = async () => {
+    const onSubmit = async (data: ForgotPasswordData) => {
         setIsLoading(true);
         try {
-            // In a production app, this would call an API to send a reset email
-            // For now, we simulate the flow
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            const response = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: data.email }),
+            });
+
+            if (!response.ok) {
+                const result = await response.json().catch(() => null);
+                throw new Error(result?.error?.message || 'Something went wrong. Please try again.');
+            }
+
             setIsSubmitted(true);
-            toast.success('Check your email for reset instructions');
-        } catch {
-            toast.error('Something went wrong. Please try again.');
+            toast.success('Reset email sent! Check your inbox.');
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Something went wrong.');
         } finally {
             setIsLoading(false);
         }

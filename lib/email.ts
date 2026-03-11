@@ -339,6 +339,100 @@ function escapeHtml(text: string): string {
 }
 
 /**
+ * Sends a password reset email with a secure one-time link.
+ *
+ * @param email - The user's email address
+ * @param name - The user's name
+ * @param token - The secure reset token
+ */
+export async function sendPasswordResetEmail(
+  email: string,
+  name: string,
+  token: string
+): Promise<boolean> {
+  const resetUrl = `${APP_URL}/reset-password?token=${token}`;
+  const subject = 'Reset your FirstDrop password';
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset your password</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f9fafb;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table role="presentation" style="width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center;">
+              <h1 style="margin: 0 0 8px 0; font-size: 26px; font-weight: 700; color: #1a202c;">Reset your password</h1>
+              <p style="margin: 0; font-size: 16px; color: #718096;">FirstDrop</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 40px;">
+              <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #4a5568;">
+                Hi ${escapeHtml(name)},<br><br>
+                We received a request to reset your password. Click the button below to choose a new one.
+                This link is valid for <strong>1 hour</strong>.
+              </p>
+              <table role="presentation" style="width: 100%;">
+                <tr>
+                  <td align="center" style="padding: 16px 0;">
+                    <a href="${resetUrl}" style="display: inline-block; padding: 16px 32px; background-color: #1a202c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                      Reset Password
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 24px 0 0 0; font-size: 14px; color: #718096;">
+                If you didn't request this, you can safely ignore this email. Your password won't change.
+              </p>
+              <p style="margin: 12px 0 0 0; font-size: 13px; color: #a0aec0; word-break: break-all;">
+                Or copy this link: ${resetUrl}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 40px 40px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0; font-size: 13px; color: #a0aec0;">
+                <a href="${APP_URL}" style="color: #1a202c; text-decoration: none;">firstdrop.me</a> — Validate startup ideas before you build
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+
+  if (!resend) {
+    console.log('📧 PASSWORD RESET EMAIL (Resend not configured)');
+    console.log(`To: ${email}, Reset URL: ${resetUrl}`);
+    return true;
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: `FirstDrop <${FROM_EMAIL}>`,
+      to: email,
+      subject,
+      html,
+    });
+    if (error) { console.error('Reset email error:', error); return false; }
+    console.log(`📧 Password reset email sent: ${data?.id}`);
+    return true;
+  } catch (error) {
+    console.error('Reset email error:', error);
+    return false;
+  }
+}
+
+/**
  * Sends a test email to verify email configuration.
  * Useful for debugging email setup.
  *
